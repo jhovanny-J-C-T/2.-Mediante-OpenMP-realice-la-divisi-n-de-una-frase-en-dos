@@ -1,31 +1,43 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.7.34221.43
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ejercicio_2", "Ejercicio_2\Ejercicio_2.vcxproj", "{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}.Debug|x64.ActiveCfg = Debug|x64
-		{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}.Debug|x64.Build.0 = Debug|x64
-		{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}.Debug|x86.ActiveCfg = Debug|Win32
-		{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}.Debug|x86.Build.0 = Debug|Win32
-		{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}.Release|x64.ActiveCfg = Release|x64
-		{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}.Release|x64.Build.0 = Release|x64
-		{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}.Release|x86.ActiveCfg = Release|Win32
-		{E036C9C2-840A-4D11-8FB6-2D0E01FFADC8}.Release|x86.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {374BAC6A-54BC-457F-827A-E82381ECE8D4}
-	EndGlobalSection
-EndGlobal
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <omp.h>
+
+int main() {
+    char frase[] = "tres tristes tigres trigaban trigo por culpa del bolivar";
+    char primera_parte[100] = "";
+    char segunda_parte[100] = "";
+
+    int longitud = strlen(frase);
+    int inicio = 0;
+    bool intercambiar = true;
+
+    #pragma omp parallel for
+    for (int i = 0; i <= longitud; ++i) {
+        if (frase[i] == ' ' || frase[i] == '\0') {
+            frase[i] = '\0';
+            if (intercambiar) {
+                #pragma omp critical
+                {
+                    strcat(primera_parte, &frase[inicio]);
+                    strcat(primera_parte, " ");
+                }
+            }
+            else {
+                    #pragma omp critical
+                {
+                    strcat(segunda_parte, &frase[inicio]);
+                    strcat(segunda_parte, " ");
+                }
+            }
+            inicio = i + 1;
+            intercambiar = !intercambiar;
+        }
+    }
+
+    printf("Primera parte: %s\n", primera_parte);
+    printf("Segunda parte: %s\n", segunda_parte);
+
+    return 0;
+}
